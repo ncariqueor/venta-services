@@ -1,5 +1,6 @@
 package com.ventas.ventasbackend.repository;
 
+import com.ventas.ventasbackend.controller.response.ClickCollectResponse;
 import com.ventas.ventasbackend.entity.dtoClickCollectVenta;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +24,7 @@ public class daoClickCollectVenta {
 
     private String SQL;
 
-    public List<dtoClickCollectVenta> ventaNeta (int inicio, int fin) {
+    public ClickCollectResponse ventaNeta (int inicio, int fin) {
         List<dtoClickCollectVenta> l = new ArrayList<dtoClickCollectVenta>();
 
         this.SQL = "select actual.fecha as fecha_actual, actual.ingreso_neto as ingreso_neto_actual, anterior.fecha as fecha_anterior, anterior.ingreso_neto as ingreso_neto_anterior\n" +
@@ -74,7 +75,11 @@ public class daoClickCollectVenta {
                 "\n" +
                 "  on anterior.fecha = date_format(actual.fecha - interval 364 day, '%Y%m%d')";
 
+        LOG.info("Se consulto la query " + SQL);
+
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(SQL);
+
+        LOG.info("Se consulto la query " + SQL);
 
         for (Map<String, Object> row : rows)
         {
@@ -91,6 +96,10 @@ public class daoClickCollectVenta {
             l.add(dto);
         }
 
-        return l;
+        ClickCollectResponse response = new ClickCollectResponse();
+
+        response.setClickCollectVenta(l);
+
+        return response;
     }
 }

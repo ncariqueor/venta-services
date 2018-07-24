@@ -1,7 +1,6 @@
 package com.ventas.ventasbackend.controller;
 
-import com.ventas.ventasbackend.controller.request.masterRequest;
-import com.ventas.ventasbackend.entity.dtoClickCollectVenta;
+import com.ventas.ventasbackend.controller.response.ClickCollectResponse;
 import com.ventas.ventasbackend.service.impl.ClickCollectVentaServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,14 +10,13 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/venta")
 public class ClickCollectVentaController {
     @Autowired
     @Qualifier("clickCollectVentaService")
     private ClickCollectVentaServiceImpl service;
 
-    @PostMapping("/venta-clickCollect")
-    public List<dtoClickCollectVenta> ventaNeta (@RequestBody masterRequest master) {//Para recibir por get, se usa pathvariable
-        return service.dataClickCollectVenta(master.getInicio(), master.getFin());
+    @GetMapping("/venta-clickCollect/{inicio}/{fin}")
+    public ClickCollectResponse ventaNeta (@PathVariable int inicio, @PathVariable int fin) {//Para recibir por post e usa RequestBody
+        return service.dataClickCollectVenta(inicio, fin);
     }
 }

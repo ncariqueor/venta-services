@@ -1,9 +1,9 @@
 package com.ventas.ventasbackend.service;
 
-import com.ventas.ventasbackend.entity.dtoClickCollectVenta;
+import com.ventas.ventasbackend.controller.response.ClickCollectResponse;
 
 import java.util.List;
 
 public interface ClickCollectVentaService {
-    public abstract List<dtoClickCollectVenta> dataClickCollectVenta (int inicio, int fin);
+    public abstract ClickCollectResponse dataClickCollectVenta (int inicio, int fin);
 }
