@@ -27,78 +27,123 @@ public class daoClickCollectVenta {
     public ClickCollectResponse ventaNeta (int inicio, int fin) {
         List<dtoClickCollectVenta> l = new ArrayList<dtoClickCollectVenta>();
 
-        this.SQL = "select actual.fecha as fecha_actual, actual.ingreso_neto as ingreso_neto_actual, anterior.fecha as fecha_anterior, anterior.ingreso_neto as ingreso_neto_anterior\n" +
+        this.SQL = "SELECT\n" +
+                "  actual.tienda as tienda,\n" +
+                "  cast(actual.pxq_ingreso as unsigned) as pxq_ingreso_actual,\n" +
+                "  cast(actual.numorden_ingreso as unsigned) as numorden_ingreso_actual,\n" +
+                "  cast(actual.cosprom_ingreso as unsigned) as cosprom_ingreso_actual,\n" +
+                "  cast(actual.pxq_nota_credito as unsigned) as pxq_nota_credito_actual,\n" +
+                "  cast(actual.numorden_nota_credito as unsigned) as numorden_nota_credito_actual,\n" +
+                "  cast(actual.cosprom_nota_credito as unsigned) as cosprom_nota_credito_actual,\n" +
                 "\n" +
-                "  from\n" +
+                "  cast(anterior.pxq_ingreso as unsigned) as pxq_ingreso_anterior,\n" +
+                "  cast(anterior.numorden_ingreso as unsigned) as numorden_ingreso_anterior,\n" +
+                "  cast(anterior.cosprom_ingreso as unsigned) as cosprom_ingreso_anterior,\n" +
+                "  cast(anterior.pxq_nota_credito as unsigned) as pxq_nota_credito_anterior,\n" +
+                "  cast(anterior.numorden_nota_credito as unsigned) as numorden_nota_credito_anterior,\n" +
+                "  cast(anterior.cosprom_nota_credito as unsigned) as cosprom_nota_credito_anterior\n" +
                 "\n" +
-                "(select i.fecha as fecha, cast(round((if(i.pxq is null, 0, i.pxq) - if(n.pxq is null, 0, n.pxq))/1.19, 0) as unsigned) as ingreso_neto\n" +
+                "FROM\n" +
                 "\n" +
-                "from\n" +
+                "  (SELECT\n" +
+                "     d.tienda_utf8      AS tienda,\n" +
+                "     d.codcomdes        as codcomdes,\n" +
+                "     CASE WHEN i.pxq IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE i.pxq END     AS pxq_ingreso,\n" +
+                "     case when i.numorden is null then 0 else i.numorden end AS numorden_ingreso,\n" +
+                "     CASE WHEN i.cosprom IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE i.cosprom END AS cosprom_ingreso,\n" +
+                "     CASE WHEN n.pxq IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE n.pxq END     AS pxq_nota_credito,\n" +
+                "     case when n.numorden is null then 0 else n.numorden end AS numorden_nota_credito,\n" +
+                "     CASE WHEN n.cosprom IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE n.cosprom END AS cosprom_nota_credito\n" +
+                "   FROM distribucion.tiendas d LEFT JOIN (SELECT\n" +
+                "                                            i.codcomdes                AS codcomdes,\n" +
+                "                                            sum(i.pxq)                 AS pxq,\n" +
+                "                                            count(DISTINCT i.numorden) AS numorden,\n" +
+                "                                            sum(i.cosprom)             AS cosprom\n" +
+                "                                          FROM venta_paris.ingreso i\n" +
+                "                                          WHERE i.fectrantsl BETWEEN " + inicio + " AND " + fin + " AND i.coddesp = 22\n" +
+                "                                          GROUP BY i.codcomdes) i ON i.codcomdes = d.codcomdes\n" +
+                "     LEFT JOIN (SELECT\n" +
+                "                  n.codcomdes                AS codcomdes,\n" +
+                "                  sum(n.pxq)                 AS pxq,\n" +
+                "                  count(DISTINCT n.numorden) AS numorden,\n" +
+                "                  sum(n.cosprom)             AS cosprom\n" +
+                "                FROM venta_paris.nota_credito n\n" +
+                "                WHERE n.feceminc BETWEEN " + inicio + " AND " + fin + " AND n.coddesp = 22\n" +
+                "                GROUP BY n.codcomdes) n ON n.codcomdes = d.codcomdes) actual\n" +
                 "\n" +
-                "(select i.fectrantsl as fecha, sum(i.pxq) as pxq\n" +
-                "from venta_paris.ingreso i\n" +
-                "where i.fectrantsl between " + inicio + " and " + fin + " and i.coddesp = 22\n" +
-                "group by i.fectrantsl\n" +
-                "order by i.fectrantsl desc) i\n" +
+                "  INNER JOIN\n" +
                 "\n" +
-                "left join\n" +
+                "  (SELECT\n" +
+                "     d.tienda_utf8      AS tienda,\n" +
+                "     d.codcomdes        as codcomdes,\n" +
+                "     CASE WHEN i.pxq IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE i.pxq END     AS pxq_ingreso,\n" +
+                "     case when i.numorden is null then 0 else i.numorden end AS numorden_ingreso,\n" +
+                "     CASE WHEN i.cosprom IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE i.cosprom END AS cosprom_ingreso,\n" +
+                "     CASE WHEN n.pxq IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE n.pxq END     AS pxq_nota_credito,\n" +
+                "     case when n.numorden is null then 0 else n.numorden end AS numorden_nota_credito,\n" +
+                "     CASE WHEN n.cosprom IS NULL\n" +
+                "       THEN 0\n" +
+                "     ELSE n.cosprom END AS cosprom_nota_credito\n" +
+                "   FROM distribucion.tiendas d LEFT JOIN (SELECT\n" +
+                "                                            i.codcomdes                AS codcomdes,\n" +
+                "                                            sum(i.pxq)                 AS pxq,\n" +
+                "                                            count(DISTINCT i.numorden) AS numorden,\n" +
+                "                                            sum(i.cosprom)             AS cosprom\n" +
+                "                                          FROM venta_paris.ingreso i\n" +
+                "                                          WHERE i.fectrantsl BETWEEN date_format(" + inicio + " - interval 364 day, '%Y%m%d') AND date_format(" + inicio + " - interval 364 day, '%Y%m%d') AND i.coddesp = 22\n" +
+                "                                          GROUP BY i.codcomdes) i ON i.codcomdes = d.codcomdes\n" +
+                "     LEFT JOIN (SELECT\n" +
+                "                  n.codcomdes                AS codcomdes,\n" +
+                "                  sum(n.pxq)                 AS pxq,\n" +
+                "                  count(DISTINCT n.numorden) AS numorden,\n" +
+                "                  sum(n.cosprom)             AS cosprom\n" +
+                "                FROM venta_paris.nota_credito n\n" +
+                "                WHERE n.feceminc BETWEEN date_format(" + inicio + " - interval 364 day, '%Y%m%d') AND date_format(" + inicio + " - interval 364 day, '%Y%m%d') AND n.coddesp = 22\n" +
+                "                GROUP BY n.codcomdes) n ON n.codcomdes = d.codcomdes) anterior\n" +
                 "\n" +
-                "  (select n.feceminc as fecha, sum(n.pxq) as pxq\n" +
-                "from venta_paris.nota_credito n\n" +
-                "where n.feceminc between " + inicio + " and " + fin + " and n.coddesp = 22\n" +
-                "group by n.feceminc\n" +
-                "order by n.feceminc desc) n\n" +
-                "\n" +
-                "  on i.fecha = n.fecha) actual\n" +
-                "\n" +
-                "left join\n" +
-                "\n" +
-                "  (select i.fecha as fecha, cast(round((if(i.pxq is null, 0, i.pxq) - if(n.pxq is null, 0, n.pxq))/1.19, 0) as unsigned) as ingreso_neto\n" +
-                "\n" +
-                "from\n" +
-                "\n" +
-                "(select i.fectrantsl as fecha, sum(i.pxq) as pxq\n" +
-                "from venta_paris.ingreso i\n" +
-                "where i.fectrantsl between date_format(" + inicio + " - interval 364 day, '%Y%m%d') and date_format(" + fin + " - interval 364 day, '%Y%m%d') and i.coddesp = 22\n" +
-                "group by i.fectrantsl\n" +
-                "order by i.fectrantsl desc) i\n" +
-                "\n" +
-                "left join\n" +
-                "\n" +
-                "  (select n.feceminc as fecha, sum(n.pxq) as pxq\n" +
-                "from venta_paris.nota_credito n\n" +
-                "where n.feceminc between date_format(" + inicio + " - interval 364 day, '%Y%m%d') and date_format(" + fin + " - interval 364 day, '%Y%m%d') and n.coddesp = 22\n" +
-                "group by n.feceminc\n" +
-                "order by n.feceminc desc) n\n" +
-                "\n" +
-                "  on i.fecha = n.fecha) anterior\n" +
-                "\n" +
-                "  on anterior.fecha = date_format(actual.fecha - interval 364 day, '%Y%m%d')";
-
-        LOG.info("Se consulto la query " + SQL);
+                "    ON actual.codcomdes = anterior.codcomdes";
 
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(SQL);
 
-        LOG.info("Se consulto la query " + SQL);
-
         for (Map<String, Object> row : rows)
         {
-
-
             dtoClickCollectVenta dto = new dtoClickCollectVenta();
 
-            dto.setFechaActual((Integer) row.get("fecha_actual"));
-            dto.setIngresoNetoActual((BigInteger) row.get("ingreso_neto_actual"));
+            dto.setTienda((String) row.get("tienda"));
+            dto.setPxq_ingreso_actual((BigInteger) row.get("pxq_ingreso_actual"));
+            dto.setNumorden_ingreso_actual((BigInteger) row.get("numorden_ingreso_actual"));
+            dto.setCosprom_ingreso_actual((BigInteger) row.get("cosprom_ingreso_actual"));
+            dto.setPxq_nota_credito_actual((BigInteger) row.get("pxq_nota_credito_actual"));
+            dto.setNumorden_nota_credito_actual((BigInteger) row.get("numorden_nota_credito_actual"));
+            dto.setCosprom_nota_credito_actual((BigInteger) row.get("cosprom_nota_credito_actual"));
 
-            dto.setFechaAnterior((Integer) row.get("fecha_anterior"));
-            dto.setIngresoNetoAnterior((BigInteger) row.get("ingreso_neto_anterior"));
+            dto.setPxq_ingreso_anterior((BigInteger) row.get("pxq_ingreso_anterior"));
+            dto.setNumorden_ingreso_anterior((BigInteger) row.get("numorden_ingreso_anterior"));
+            dto.setCosprom_ingreso_anterior((BigInteger) row.get("cosprom_ingreso_anterior"));
+            dto.setPxq_nota_credito_anterior((BigInteger) row.get("pxq_nota_credito_anterior"));
+            dto.setNumorden_nota_credito_anterior((BigInteger) row.get("numorden_nota_credito_anterior"));
+            dto.setCosprom_nota_credito_anterior((BigInteger) row.get("cosprom_nota_credito_anterior"));
 
             l.add(dto);
         }
 
         ClickCollectResponse response = new ClickCollectResponse();
 
-        response.setClickCollectVenta(l);
+        response.setData(l);
 
         return response;
     }

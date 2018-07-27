@@ -6,13 +6,13 @@ import java.util.List;
 
 public class ClickCollectResponse {
 
-    private List<dtoClickCollectVenta> clickCollectVenta;
+    private List<dtoClickCollectVenta> data;
 
-    public List<dtoClickCollectVenta> getClickCollectVenta() {
-        return clickCollectVenta;
+    public List<dtoClickCollectVenta> getData() {
+        return data;
     }
 
-    public void setClickCollectVenta(List<dtoClickCollectVenta> clickCollectVenta) {
-        this.clickCollectVenta = clickCollectVenta;
+    public void setData(List<dtoClickCollectVenta> clickCollectVenta) {
+        this.data = clickCollectVenta;
     }
 }
